@@ -1,0 +1,463 @@
+
+import os
+import threading
+import logging
+from dotenv import load_dotenv
+
+from SkillsManager import SkillsManager # Pip install SkillsManager using `pip install SkillsManager`
+
+load_dotenv()
+
+logger = logging.getLogger(__name__)
+
+# Set These Environment Variables in your .env file or system environment variables
+# SHOW_CAPABILITIES=True (optional, to show capabilities at startup)
+# SHOW_METADATA=True (optional, to show metadata at startup)
+# SHOW_CALLED_ACTIONS=True (optional, to show called actions during execution)
+
+
+class SkillGraph:
+    _instance = None
+    _lock = threading.Lock()
+
+    def __new__(cls, *args, **kwargs):
+        if not cls._instance:
+            with cls._lock:
+                if not cls._instance:
+                    cls._instance = super(SkillGraph, cls).__new__(cls)
+        return cls._instance
+
+    def __init__(self):
+        if getattr(self, 'initialized', False):
+            return
+        self._initComponents()
+        self.initialized = True
+
+    def _initComponents(self):
+        self.skillsManager     = SkillsManager() # Can pass in autoReload=True and cycleInterval=60 to automatically reload skills when they change.
+        # Set your base directories. Is equivalent to r"C:\path\to\TechBook_Skills" on Windows or "/path/to/TechBook_Skills" on Linux/Mac.
+        self.baseSkillsDir     = self.getDir('TechBook_Skills')
+        self.baseToolsDir      = self.getDir('TechBook_Tools')
+        self.printCapabilities = os.getenv('SHOW_CAPABILITIES', 'False') == 'True'
+        self.printMetaData     = os.getenv('SHOW_METADATA', 'False') == 'True'
+        self.skillComponents()
+        self.toolComponents()
+
+    def getDir(self, *paths):
+        return self.skillsManager.getDir(*paths)
+
+    def setAutoReload(self, autoReload: bool = False, cycleInterval: int = 60) -> None:
+        """
+        Set whether to automatically reload skills when they change.
+        This is useful for development and testing purposes.
+        Only necessary when letting the agent create new skills or when you want to refresh the skills during runtime.
+        """
+        self.skillsManager.setAutoReload(autoReload, cycleInterval)
+
+    # If you rather not separate the skills into dynamic, static and restricted components, you can skip the following methods and make 
+    # it simpler by using just using 1 method to load all skills.
+    # See below for different options for loading skills and tools.
+    def skillComponents(self):
+        """
+        Load dynamic components for user and self skills.
+        Dynamic components are those that can be reloaded or changed during runtime.
+        """
+        self.userSkills = [] # If not using user setup, you can skip this.
+        self.agentSkills = []
+        self.skillsManager.loadComponents(
+            paths=[
+                [self.getDir(self.baseSkillsDir, 'User')], # If not using user setup, you can skip this. Refer to the Example_3.py for more details on how to use the user skills.
+                [self.getDir(self.baseSkillsDir, 'Agent')]
+            ],
+            components=[
+                self.userSkills, # If not using user setup, you can skip this.
+                self.agentSkills
+            ],
+            reloadable=[
+                False, # If not using user setup, you can skip this.
+                False # This is for dynamic skills, so set to True if you want to reload them.
+            ]
+        )
+
+    def toolComponents(self):
+        """
+        Load custom tools for the self agent.
+        These tools are not part of the dynamic, static and restricted skills.
+        """
+        self.agentTools = []
+        self.skillsManager.loadComponents(
+            paths=[
+                [self.getDir(self.baseToolsDir, 'Tools')]
+            ],
+            components=[
+                self.agentTools
+            ],
+            reloadable=[
+                False
+            ]
+        )
+
+    def getUserActions(self, content):
+        """
+        Get user actions based on the provided content.
+        This method combines dynamic, static, and restricted user skills to return the available actions.
+        Use only if you want to get user actions based on the content provided.
+        """
+        # If you are not using user skills, you can skip this method. Refer to the Example_3.py for more details on how to use the user skills.
+        skills = (
+            self.userSkills
+        )
+        return self.skillsManager.getComponents(skills, content)
+
+    def getAgentActions(self):
+        """
+        Get self actions based on the available skills.
+        This method combines dynamic, static, and restricted self skills to return the available actions.
+        """
+        skills = (
+            self.agentSkills
+        )
+        return self.skillsManager.getComponents(skills)
+
+    def reloadSkills(self):
+        """ 
+        Reload all skills and print any new skills added.
+        Only necessary when letting the agent create new skills or when you want to refresh the skills during runtime.
+        """
+        original = self.getMetaData()
+        self.skillsManager.reloadSkills()
+        new = self.getMetaData()
+        for skill in new:
+            if skill not in original:
+                print(f"I've added the new skill {skill['className']} That {skill['description']}.\n")
+
+    def getMetaData(self):
+        """Get metadata for all skills."""
+        metaData = (
+                self.userSkills + self.agentSkills + self.agentTools
+        )
+        return self.skillsManager.getMetaData(metaData, self.printMetaData)
+
+
+    # ----- Skills -----
+    def getAgentCapabilities(self):
+        """
+        Get capabilities of the self agent based on its skills.
+        This method combines dynamic, static, and restricted self skills to return the available capabilities.
+        """
+        description = False
+        capabitites = (
+            self.agentSkills
+        )
+        return self.skillsManager.getCapabilities(capabitites, self.printCapabilities, description)
+
+    def checkActions(self, action: str) -> str:
+        """
+        Check if the given action is available in the self agent's skills.
+        If the action is not found, it will return an error message.
+        """
+        return self.skillsManager.checkActions(action)
+
+    def getActions(self, action: str) -> list:
+        """
+        Get actions available for the self agent based on the given action string.
+        If the action is not found, it will return an empty list.
+        """
+        return self.skillsManager.getActions(action)
+
+    def executeAction(self, actions, action):
+        """
+        Execute a single action from the self agent's skills.
+        If the action is not found, it will return an error message.
+        You must do your own for loop to iterate through the actions.
+        """
+        return self.skillsManager.executeAction(actions, action)
+
+    def executeActions(self, actions, action):
+        """
+        Execute multiple actions from the self agent's skills.
+        If the action is not found, it will return an error message.
+
+        The for loop is done for you to iterate through the actions.
+        """
+        return self.skillsManager.executeActions(actions, action)
+
+    def skillInstructions(self):
+        """
+        Get action instructions for the self agent based on its capabilities.
+        This method returns a string that describes how the self agent can perform actions.
+        """
+        return self.skillsManager.skillInstructions(self.getAgentCapabilities())
+
+
+
+    # ----- Tools -----
+    def executeTool(self, name, tools, args, threshold=80, retry=True):
+        """
+        Execute a tool with the given name, tools, and arguments.
+        If the tool is not found, it will return an error message.
+        If the tool execution fails, it will retry based on the retry parameter.
+        """
+        return self.skillsManager.executeTool(name, tools, args, threshold, retry)
+
+    def getTools(self):
+        """
+        Get all tools available for the self agent.
+        """
+        tools = (
+            self.agentTools
+        )
+        return self.skillsManager.getTools(tools)
+
+    def extractJson(self, text):
+        """
+        Extract the first JSON array or object from a string, even if wrapped in markdown or extra commentary.
+        """
+        return self.skillsManager.extractJson(text)
+
+    def getJsonSchema(self, func, schemaType):
+        """
+        Build a json schema for a function based on its signature and docstring metadata.
+        The schemaType can be either 'completions' or 'responses'.
+        Compatible with the OpenAI API and similar services that use JSON schemas.
+        Returns a dictionary representing the schema.
+        """
+        return self.skillsManager.getJsonSchema(func, schemaType)
+
+    def getTypedSchema(self, func):
+        """
+        Build a typed schema for a function based on its signature and docstring metadata.
+        Compatible with the Google API.
+        Returns a dictionary representing the schema.
+        """
+        return self.skillsManager.getTypedSchema(func)
+
+
+    # ----- Can be used with both skills and tools -----
+    def isStructured(self, *args):
+        """
+        Check if any of the arguments is a list of dictionaries.
+        This indicates structured input (multi-message format).
+        """
+        return self.skillsManager.isStructured(*args)
+
+    def handleTypedFormat(self, role: str = "user", content: str = ""):
+        """
+        Format content for Google GenAI APIs.
+        """
+        return self.skillsManager.handleTypedFormat(role, content)
+
+    def handleJsonFormat(self, role: str = "user", content: str = ""):
+        """
+        Format content for OpenAI APIs and similar JSON-based APIs.
+        """
+        return self.skillsManager.handleJsonFormat(role, content)
+
+    def formatTypedExamples(self, items):
+        """
+        Handle roles for Google GenAI APIs, converting items to Gemini Content/Part types.
+        Accepts a list of (role, value) tuples, where value can be:
+            - str: will be wrapped using handleTypedFormat
+            - dict: wrapped as Content with role, value as text
+            - list of dicts: each dict converted to Content with role, dict as text
+        Returns a flat list of Content objects.
+        """
+        return self.skillsManager.formatTypedExamples(items)
+
+    def formatJsonExamples(self, items):
+        """
+        Handle roles for OpenAI APIs, converting items to JSON message format.
+        Accepts a list of (role, value) tuples, where value can be:
+            - str: will be wrapped using handleJsonFormat
+            - dict: added as-is
+            - list of dicts: each dict is added individually
+        Returns a flat list of message dicts.
+        """
+        return self.skillsManager.formatJsonExamples(items)
+
+    def formatExamples(self, items, formatFunc):
+        """
+        Ultra-robust handler for message formatting.
+        Accepts string, dict, list of any mix, any nested depth.
+        Silently ignores None. Converts numbers and bools to strings.
+        """
+        return self.skillsManager.formatExamples(items, formatFunc)
+
+    def handleTypedExamples(self, items):
+        """
+        Handle roles for Google GenAI APIs, converting items to Gemini Content/Part types.
+        Accepts a list of (role, value) tuples, where value can be:
+            - str: will be wrapped using handleTypedFormat
+            - dict: wrapped as Content with role, value as text
+            - list of dicts: each dict converted to Content with role, dict as text
+        Returns a flat list of Content objects.
+        """
+        return self.skillsManager.handleTypedExamples(items)
+
+    def handleJsonExamples(self, items):
+        """
+        Handle roles for OpenAI APIs, converting items to JSON message format.
+        Accepts a list of (role, value) tuples, where value can be:
+            - str: will be wrapped using handleJsonFormat
+            - dict: added as-is
+            - list of dicts: each dict is added individually
+        Returns a flat list of message dicts.
+        """
+        return self.skillsManager.handleJsonExamples(items)
+
+    def handleExamples(self, items, formatFunc):
+        """
+        Ultra-robust handler for message formatting.
+        Accepts string, dict, list of any mix, any nested depth.
+        Silently ignores None. Converts numbers and bools to strings.
+        """
+        return self.skillsManager.handleExamples(items, formatFunc)
+
+    def buildGoogleSafetySettings(self, harassment="BLOCK_NONE", hateSpeech="BLOCK_NONE", sexuallyExplicit="BLOCK_NONE", dangerousContent="BLOCK_NONE"):
+        """
+        Construct a list of Google GenAI SafetySetting objects.
+        """
+        return self.skillsManager.buildGoogleSafetySettings(harassment, hateSpeech, sexuallyExplicit, dangerousContent)
+
+
+    # ----- Loading Skills and Tools -----
+    # Below shows multiple options for loading skills and tools from multiple directories.
+    # Option 1: Separate methods for loading dynamic, static, and restricted components
+    def dynamicComponents(self):
+        """
+        Load dynamic components for user and self skills.
+        Dynamic components are those that can be reloaded or changed during runtime.
+        """
+        self.dynamicUserSkills = [] # If not using user setup, you can skip this.
+        self.dynamicAgentSkills = []
+        self.skillsManager.loadComponents(
+            paths=[
+                [self.getDir(self.baseSkillsDir, 'User', 'Created'), self.getDir(self.baseSkillsDir, 'User', 'Dynamic')], # If not using user setup, you can skip this.
+                [self.getDir(self.baseSkillsDir, 'Agent', 'Created'), self.getDir(self.baseSkillsDir, 'Agent', 'Dynamic')]
+            ],
+            components=[
+                self.dynamicUserSkills, # If not using user setup, you can skip this.
+                self.dynamicAgentSkills
+            ],
+            reloadable=[
+                True, # If not using user setup, you can skip this.
+                True
+            ]
+        )
+
+    def staticComponents(self):
+        """
+        Load static components for user and self skills.
+        """
+        self.staticUserSkills = [] # If not using user setup, you can skip this.
+        self.staticAgentSkills = []
+        self.skillsManager.loadComponents(
+            paths=[
+                [self.getDir(self.baseSkillsDir, 'User', 'Static')], # If not using user setup, you can skip this.
+                [self.getDir(self.baseSkillsDir, 'Agent', 'Static')]
+            ],
+            components=[
+                self.staticUserSkills, # If not using user setup, you can skip this.
+                self.staticAgentSkills
+            ],
+            reloadable=[
+                False, # If not using user setup, you can skip this.
+                False
+            ]
+        )
+
+    def restrictedComponents(self):
+        """
+        Load restricted components for user and self skills.
+        """
+        self.restrictedUserSkills = [] # If not using user setup, you can skip this.
+        self.restrictedAgentSkills = []
+        self.skillsManager.loadComponents(
+            paths=[
+                [self.getDir(self.baseSkillsDir, 'User', 'Restricted')], # If not using user setup, you can skip this.
+                [self.getDir(self.baseSkillsDir, 'Agent', 'Restricted')]
+            ],
+            components=[
+                self.restrictedUserSkills, # If not using user setup, you can skip this.
+                self.restrictedAgentSkills
+            ],
+            reloadable=[
+                False, # If not using user setup, you can skip this.
+                False
+            ]
+        )
+
+    # Option 2: Single method for loading all skills
+    def loadAllComponents(self):
+        """
+        Load dynamic, static, and restricted components simplified into a single method,
+        and excluding user skills if not needed.
+        No advanced logic.
+        """
+        self.dynamicAgentSkills = []
+        self.skillsManager.loadComponents(
+            paths=[[
+                self.getDir(self.baseSkillsDir, 'Agent', 'Created'), 
+                self.getDir(self.baseSkillsDir, 'Agent', 'Dynamic')]
+            ],
+            components=[self.dynamicAgentSkills],
+            reloadable=[True]
+        )
+
+        self.staticAgentSkills = []
+        self.skillsManager.loadComponents(
+            paths=[[self.getDir(self.baseSkillsDir, 'Agent', 'Static')]],
+            components=[self.staticAgentSkills],
+            reloadable=[False]
+        )
+
+        self.restrictedAgentSkills = []
+        self.skillsManager.loadComponents(
+            paths=[[self.getDir(self.baseSkillsDir, 'Agent', 'Restricted')]],
+            components=[self.restrictedAgentSkills],
+            reloadable=[False]
+        )
+
+        self.agentTools = []
+        self.skillsManager.loadComponents(
+            paths=[[self.getDir(self.baseToolsDir, 'Tools')]],
+            components=[self.agentTools],
+            reloadable=[False]
+        )
+
+    # Option 3: For advanced users, you can customize the loading of skills and tools
+    def loadAllomponents(self):
+        """
+        Load dynamic, static, and restricted Agent components.
+        """
+        COMPONENTS = {
+            'dynamic': {
+                'attr': 'dynamicAgentSkills',
+                'paths': [self.getDir(self.baseSkillsDir, 'Agent', 'Created'), self.getDir(self.baseSkillsDir, 'Agent', 'Dynamic')],
+                'reloadable': True
+            },
+            'static': {
+                'attr': 'staticAgentSkills',
+                'paths': [self.getDir(self.baseSkillsDir, 'Agent', 'Static')],
+                'reloadable': False
+            },
+            'restricted': {
+                'attr': 'restrictedAgentSkills',
+                'paths': [self.getDir(self.baseSkillsDir, 'Agent', 'Restricted')],
+                'reloadable': False
+            },
+            'tools': {
+                'attr': 'agentTools',
+                'paths': [self.getDir(self.baseToolsDir, 'Tools')],
+                'reloadable': False
+            }
+        }
+
+        for key, opts in COMPONENTS.items():
+            setattr(self, opts['attr'], [])
+            self.skillsManager.loadComponents(
+                paths=[opts['paths']],
+                components=[getattr(self, opts['attr'])],
+                reloadable=[opts['reloadable']]
+            )
+
