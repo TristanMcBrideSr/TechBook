@@ -31,8 +31,8 @@ class ClassName: # This is a placeholder for the class name, replace with your a
         self.fooSkills = []
         self.barSkills = []
         self.barTools  = []
-        self.printCapabilities = os.getenv('SHOW_CAPABILITIES', 'False') == 'True'
-        self.printMetaData     = os.getenv('SHOW_METADATA', 'False') == 'True'
+        self.showSkills   = os.getenv('SHOW_SKILLS', 'False') == 'True'
+        self.showMetaData = os.getenv('SHOW_METADATA', 'False') == 'True'
         self.loadSkills()
         self.loadTools()
         self.initialized = True
@@ -83,10 +83,10 @@ class ClassName: # This is a placeholder for the class name, replace with your a
         metaData = (
             self.fooSkills + self.barSkills
         )
-        return self.skillsmanager.getMetaData(metaData, self.printMetaData)
+        return self.skillsmanager.getMetaData(metaData, self.showMetaData)
 
     def getCapabilities(self):
-        return self.skillsmanager.getCapabilities(self.barSkills, self.printCapabilities)
+        return self.skillsmanager.getCapabilities(self.barSkills, self.showSkills)
 
     def checkActions(self, action: str):
         return self.skillsmanager.checkActions(action)

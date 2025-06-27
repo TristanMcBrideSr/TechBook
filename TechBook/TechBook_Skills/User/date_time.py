@@ -2,7 +2,8 @@
 from datetime import datetime
 import threading
 import logging
-from SkillsManager import ArgumentParser
+import inspect
+from SkillsManager import SkillsManager
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +26,7 @@ class DTManager:
         self.initialized = True
 
     def _initComponents(self):
-        self.argParser = ArgumentParser()
+        self.skillsManager = SkillsManager()
         self.actionMap = {
             "what is the date": self._getCurrentDate,
             "what is the time": self._getCurrentTime,
@@ -39,19 +40,24 @@ class DTManager:
 
     def executeAction(self, ctx: str) -> str:
         """
-        Description: Executes the requested action for date/time management based on context.
+        We made it even easies to execute actions by using the SkillsManager to handle
+        the action execution. This way, we can easily add new actions without modifying
+        the code here, just by adding them to the actionMap.
         """
-        self.argParser.printArgs(self, locals())
-        try:
-            action = ctx.lower()
-            actionKey = next((key for key in self.actionMap if key in action), None)
-            if not actionKey:
-                return None
-            args = action.replace(actionKey, "", 1).strip()
-            return self.actionMap[actionKey](args)
-        except Exception as e:
-            logger.error(f"Error executing {self.__class__.__name__.lower()}Action '{ctx}':", exc_info=True)
-            return f"Error: {e}"
+        # self.argParser.printArgs(self, locals())
+        # try:
+        #     action = ctx.lower()
+        #     actionKey = next((key for key in self.actionMap if key in action), None)
+        #     if not actionKey:
+        #         return None
+        #     args = action.replace(actionKey, "", 1).strip()
+        #     return self.actionMap[actionKey](args)
+        # except Exception as e:
+        #     logger.error(f"Error executing {self.__class__.__name__.lower()}Action '{ctx}':", exc_info=True)
+        #     return f"Error: {e}"
+        self.skillsManager.argParser.printArgs(self, locals())
+        name = inspect.currentframe().f_code.co_name
+        return self.skillsManager.executeSkill('user', name, self.actionMap, ctx)
 
     def _getCurrentDate(self, *args):
         return datetime.now().strftime('%d-%B-%Y')

@@ -1,4 +1,5 @@
 
+
 import os
 import threading
 import logging
@@ -36,12 +37,27 @@ class SkillGraph:
     def _initComponents(self):
         self.skillsManager     = SkillsManager() # Can pass in autoReload=True and cycleInterval=60 to automatically reload skills when they change.
         # Set your base directories. Is equivalent to r"C:\path\to\TechBook_Skills" on Windows or "/path/to/TechBook_Skills" on Linux/Mac.
-        self.baseSkillsDir     = self.getDir('TechBook_Skills')
-        self.baseToolsDir      = self.getDir('TechBook_Tools')
-        self.printCapabilities = os.getenv('SHOW_CAPABILITIES', 'False') == 'True'
-        self.printMetaData     = os.getenv('SHOW_METADATA', 'False') == 'True'
+        self.baseSkillsDir = self.getDir('TechBook_Skills')
+        self.baseToolsDir  = self.getDir('TechBook_Tools')
+        self.showSkills    = os.getenv('SHOW_SKILLS', 'False') == 'True'
+        self.showTools     = os.getenv('SHOW_Tools', 'False') == 'True'
+        self.schemaType    = os.getenv('SCHEMA_TYPE', 'chat_completions').lower()  # Default to 'chat_completions' if not set
+        self.showMetaData  = os.getenv('SHOW_METADATA', 'False') == 'True'
         self.skillComponents()
         self.toolComponents()
+        self.showSkillsAndTools()  # Load skills and tools at startup if configured to do so.
+
+    def showSkillsAndTools(self):
+        if self.showSkills:
+            self.getAgentCapabilities()  # Load agent capabilities after skills to ensure they are available for use.
+        if self.showMetaData:
+            self.getMetaData() # Load metadata after skills to ensure it is available for use.
+        if self.showTools and self.schemaType == 'chat_completions':
+            self.getTools()
+        if self.showTools and self.schemaType == 'responses':
+            self.getTools()  # Load tools after skills to ensure they are available for use.
+        if self.showTools and self.schemaType == 'typed':
+            self.getTools()
 
     def getDir(self, *paths):
         return self.skillsManager.getDir(*paths)
@@ -136,7 +152,7 @@ class SkillGraph:
         metaData = (
                 self.userSkills + self.agentSkills + self.agentTools
         )
-        return self.skillsManager.getMetaData(metaData, self.printMetaData)
+        return self.skillsManager.getMetaData(metaData, self.showMetaData)
 
 
     # ----- Skills -----
@@ -149,7 +165,7 @@ class SkillGraph:
         capabitites = (
             self.agentSkills
         )
-        return self.skillsManager.getCapabilities(capabitites, self.printCapabilities, description)
+        return self.skillsManager.getCapabilities(capabitites, self.showSkills, description)
 
     def checkActions(self, action: str) -> str:
         """
@@ -187,7 +203,26 @@ class SkillGraph:
         Get action instructions for the self agent based on its capabilities.
         This method returns a string that describes how the self agent can perform actions.
         """
-        return self.skillsManager.skillInstructions(self.getAgentCapabilities())
+        # If you want to use the default skill instructions without examples, uncomment the next line
+        # and comment the line below it.
+        #return self.skillsManager.skillInstructions(self.getAvaCapabilities())
+        return self.skillsManager.skillInstructions(self.getAgentCapabilities(), self.skillExamples())
+
+    def skillExamples(self):
+        """
+        Get examples of how to use skills from your naming conventions.
+        This should be customized to match your skill naming conventions.
+        """
+        return (
+            "Single Action Examples:\n" # Don't change this line
+            "- ['getDate()']\n" # Change to match your skill naming conventions
+            "- ['getTime()']\n" # Change to match your skill naming conventions
+            "- ['getDate()', 'getTime()']\n"
+            "Skill With Sub-Action Examples:\n" # Don't change this line
+            "- ['appSkill(\"open\", \"Notepad\")']\n" # Change to match your skill naming conventions
+            "- ['appSkill(\"open\", \"Notepad\")', 'appSkill(\"open\", \"Word\")']\n"
+            "- ['weatherSkill(\"get-weather\", 47.6588, -117.4260)']\n" # Change to match your skill naming conventions
+        )
 
 
 
@@ -204,10 +239,11 @@ class SkillGraph:
         """
         Get all tools available for the self agent.
         """
+        
         tools = (
             self.agentTools
         )
-        return self.skillsManager.getTools(tools)
+        return self.skillsManager.getTools(tools, self.showTools, self.schemaType)
 
     def extractJson(self, text):
         """

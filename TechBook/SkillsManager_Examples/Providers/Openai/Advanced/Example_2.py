@@ -15,16 +15,17 @@ tools = [toolSchemaManager.buildToolSchema(f, schemaType) for f in toolFunctions
 systemPrompt = "You are a helpful assistant that can call functions to get information."
 gptClient = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-if showLoadedTools:
-    print(f"Discovered tools: {list(toolFunctions.keys())}")
-    schemaJson = json.dumps(tools, indent=2)
-    schemaJson = re.sub(
-        r'("description": ")(.*?)(\")',
-        lambda m: m.group(1) + m.group(2).replace('\\n', '\n\t\t') + m.group(3),
-        schemaJson,
-        flags=re.DOTALL
-    )
-    print(f"Tools schema: {schemaJson}")
+# No longer needed as its handled by the SkillGraph
+# if showLoadedTools:
+#     print(f"Discovered tools: {list(toolFunctions.keys())}")
+#     schemaJson = json.dumps(tools, indent=2)
+#     schemaJson = re.sub(
+#         r'("description": ")(.*?)(\")',
+#         lambda m: m.group(1) + m.group(2).replace('\\n', '\n\t\t') + m.group(3),
+#         schemaJson,
+#         flags=re.DOTALL
+#     )
+#     print(f"Tools schema: {schemaJson}")
 
 def formatMessage(role, content):
     return toolSchemaManager.handleFormat(role, content)
@@ -80,4 +81,4 @@ if __name__ == "__main__":
             print("Exiting...")
             break
         response = processInput(user_input)
-        print(f"Assistant: {response}")
+        print(f"Assistant: {response}")g
