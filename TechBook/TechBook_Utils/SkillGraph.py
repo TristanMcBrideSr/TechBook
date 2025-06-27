@@ -40,7 +40,7 @@ class SkillGraph:
         self.baseSkillsDir = self.getDir('TechBook_Skills')
         self.baseToolsDir  = self.getDir('TechBook_Tools')
         self.showSkills    = os.getenv('SHOW_SKILLS', 'False') == 'True'
-        self.showTools     = os.getenv('SHOW_Tools', 'False') == 'True'
+        self.showTools     = os.getenv('SHOW_TOOLS', 'False') == 'True'
         self.schemaType    = os.getenv('SCHEMA_TYPE', 'chat_completions').lower()  # Default to 'chat_completions' if not set
         self.showMetaData  = os.getenv('SHOW_METADATA', 'False') == 'True'
         self.skillComponents()
