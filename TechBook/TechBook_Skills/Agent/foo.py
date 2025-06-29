@@ -1,3 +1,7 @@
+
+##-------------------------- This is a quick example of how to use the SkillsManager to execute actions using dicts and lists --------------------------##
+# Please refer to get_weather.py for a more complete example of how to use the SkillsManager to execute actions using dicts and lists.
+
 import logging
 import subprocess
 import os

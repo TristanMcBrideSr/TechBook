@@ -221,7 +221,7 @@ class SkillGraph:
             "Skill With Sub-Action Examples:\n" # Don't change this line
             "- ['appSkill(\"open\", \"Notepad\")']\n" # Change to match your skill naming conventions
             "- ['appSkill(\"open\", \"Notepad\")', 'appSkill(\"open\", \"Word\")']\n"
-            "- ['weatherSkill(\"get-weather\", 47.6588, -117.4260)']\n" # Change to match your skill naming conventions
+            "- ['weatherSkill(\"get-weather\", \"47.6588\", \"-117.4260\")']\n" # Change to match your skill naming conventions
         )
 
 
