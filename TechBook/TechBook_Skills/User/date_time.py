@@ -40,7 +40,7 @@ class DTManager:
 
     def executeAction(self, ctx: str) -> str:
         """
-        We made it even easies to execute actions by using the SkillsManager to handle
+        We made it even easier to execute actions by using the SkillsManager to handle
         the action execution. This way, we can easily add new actions without modifying
         the code here, just by adding them to the actionMap.
         """
