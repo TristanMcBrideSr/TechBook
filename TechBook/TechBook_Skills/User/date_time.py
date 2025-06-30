@@ -59,8 +59,8 @@ class DTManager:
         name = inspect.currentframe().f_code.co_name
         return self.skillsManager.executeSkill('user', name, self.actionMap, ctx)
 
-    def _getCurrentDate(self, *args):
+    def _getCurrentDate(self, *args): # FOR SAFETY REASONS ALWAYS ADD *args TO THE FUNCTION SIGNATURE EVEN IF NOT USED
         return datetime.now().strftime('%d-%B-%Y')
 
-    def _getCurrentTime(self, *args):
+    def _getCurrentTime(self, *args): # FOR SAFETY REASONS ALWAYS ADD *args TO THE FUNCTION SIGNATURE EVEN IF NOT USED
         return datetime.now().strftime('%H:%M')
