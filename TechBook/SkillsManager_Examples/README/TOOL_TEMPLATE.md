@@ -62,7 +62,7 @@ import threading
 import os
 import subprocess
 import logging
-from SkillsManager import ArgumentParser
+from SkillLink import ArgumentParser
 
 logger = logging.getLogger(__name__)
 
@@ -155,7 +155,7 @@ Private (underscore-prefixed) helpers are ignored.
 ```python
 import os
 import subprocess
-from SkillsManager import ArgumentParser
+from SkillLink import ArgumentParser
 
 NAME_REPLACEMENTS = {
     "vs code":     "code",

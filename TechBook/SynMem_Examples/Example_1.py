@@ -95,7 +95,7 @@ class Memory:
         self._setSynMemConfig()
         self._startAutoMaintenance()
         self._performStartupChecks()
-        # #f your using the SkillGraph and SkillsManager you can use the following actionMap to allow the model to call these methods.
+        # #f your using the SkillGraph and SkillLink you can use the following actionMap to allow the model to call these methods.
         # Refer to Example_2.py for more details on how to use the actionMap.
         self.actionMap = {
             "retrieve-conversation-details":  self.retrieveConversationDetails,

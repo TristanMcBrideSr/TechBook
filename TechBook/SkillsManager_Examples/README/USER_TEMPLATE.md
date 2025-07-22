@@ -28,7 +28,7 @@ No decorators, no schemas, no wrappers.
 ```python
 import threading
 import logging
-from SkillsManager import ArgumentParser
+from SkillLink import ArgumentParser
 
 logger = logging.getLogger(__name__)
 
@@ -83,7 +83,7 @@ class DateTimeManager:
 
 ```python
 from datetime import datetime
-from SkillsManager import ArgumentParser
+from SkillLink import ArgumentParser
 
 def _getCurrentDate(*args) -> str:
     return datetime.now().strftime('%d-%B-%Y')
@@ -119,7 +119,7 @@ def executeAction(ctx: str):
 * **ALWAYS** use an action mapping (`actionMap` or `ACTION_MAP`) to map context to actions.
 * **NEVER** use plain standalone functions as skills.
 * **ALWAYS** use `*args` in handler functions.
-* **ONLY** import `ArgumentParser` from `SkillsManager`.
+* **ONLY** import `ArgumentParser` from `SkillLink`.
 
 ---
 

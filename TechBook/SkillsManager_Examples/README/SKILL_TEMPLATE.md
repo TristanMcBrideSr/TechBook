@@ -74,7 +74,7 @@ import os
 import subprocess
 import logging
 import inspect
-from SkillsManager import ArgumentParser
+from SkillLink import ArgumentParser
 
 logger = logging.getLogger(__name__)
 
@@ -174,7 +174,7 @@ all valid **Actions** and argument info are read out of the `ACTION_MAP`.
 import os
 import subprocess
 import inspect
-from SkillsManager import ArgumentParser
+from SkillLink import ArgumentParser
 
 NAME_REPLACEMENTS = {
     "vs code":     "code",
@@ -248,7 +248,7 @@ Private (underscore-prefixed) helpers are ignored.
 ```python
 import os
 import subprocess
-from SkillsManager import ArgumentParser
+from SkillLink import ArgumentParser
 
 NAME_REPLACEMENTS = {
     "vs code":     "code",

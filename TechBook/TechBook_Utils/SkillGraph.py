@@ -5,7 +5,7 @@ import threading
 import logging
 from dotenv import load_dotenv
 
-from SkillsManager import SkillsManager # Pip install SkillsManager using `pip install SkillsManager`
+from SkillLink import SkillLink # Pip install SkillLink using `pip install SkillLink`
 
 load_dotenv()
 
@@ -35,7 +35,7 @@ class SkillGraph:
         self.initialized = True
 
     def _initComponents(self):
-        self.skillsManager     = SkillsManager() # Can pass in autoReload=True and cycleInterval=60 to automatically reload skills when they change.
+        self.skillLink     = SkillLink() # Can pass in autoReload=True and cycleInterval=60 to automatically reload skills when they change.
         # Set your base directories. Is equivalent to r"C:\path\to\TechBook_Skills" on Windows or "/path/to/TechBook_Skills" on Linux/Mac.
         self.baseSkillsDir = self.getDir('TechBook_Skills')
         self.baseToolsDir  = self.getDir('TechBook_Tools')
@@ -60,7 +60,7 @@ class SkillGraph:
             self.getTools()
 
     def getDir(self, *paths):
-        return self.skillsManager.getDir(*paths)
+        return self.skillLink.getDir(*paths)
 
     def setAutoReload(self, autoReload: bool = False, cycleInterval: int = 60) -> None:
         """
@@ -68,7 +68,7 @@ class SkillGraph:
         This is useful for development and testing purposes.
         Only necessary when letting the agent create new skills or when you want to refresh the skills during runtime.
         """
-        self.skillsManager.setAutoReload(autoReload, cycleInterval)
+        self.skillLink.setAutoReload(autoReload, cycleInterval)
 
     # If you rather not separate the skills into dynamic, static and restricted components, you can skip the following methods and make 
     # it simpler by using just using 1 method to load all skills.
@@ -80,7 +80,7 @@ class SkillGraph:
         """
         self.userSkills = [] # If not using user setup, you can skip this.
         self.agentSkills = []
-        self.skillsManager.loadComponents(
+        self.skillLink.loadComponents(
             paths=[
                 [self.getDir(self.baseSkillsDir, 'User')], # If not using user setup, you can skip this. Refer to the Example_3.py for more details on how to use the user skills.
                 [self.getDir(self.baseSkillsDir, 'Agent')]
@@ -101,7 +101,7 @@ class SkillGraph:
         These tools are not part of the dynamic, static and restricted skills.
         """
         self.agentTools = []
-        self.skillsManager.loadComponents(
+        self.skillLink.loadComponents(
             paths=[
                 [self.getDir(self.baseToolsDir, 'Tools')]
             ],
@@ -123,7 +123,7 @@ class SkillGraph:
         skills = (
             self.userSkills
         )
-        return self.skillsManager.getComponents(skills, content)
+        return self.skillLink.getComponents(skills, content)
 
     def getAgentActions(self):
         """
@@ -133,7 +133,7 @@ class SkillGraph:
         skills = (
             self.agentSkills
         )
-        return self.skillsManager.getComponents(skills)
+        return self.skillLink.getComponents(skills)
 
     def reloadSkills(self):
         """ 
@@ -141,7 +141,7 @@ class SkillGraph:
         Only necessary when letting the agent create new skills or when you want to refresh the skills during runtime.
         """
         original = self.getMetaData()
-        self.skillsManager.reloadSkills()
+        self.skillLink.reloadSkills()
         new = self.getMetaData()
         for skill in new:
             if skill not in original:
@@ -152,7 +152,7 @@ class SkillGraph:
         metaData = (
                 self.userSkills + self.agentSkills + self.agentTools
         )
-        return self.skillsManager.getMetaData(metaData, self.showMetaData)
+        return self.skillLink.getMetaData(metaData, self.showMetaData)
 
 
     # ----- Skills -----
@@ -165,21 +165,21 @@ class SkillGraph:
         capabitites = (
             self.agentSkills
         )
-        return self.skillsManager.getCapabilities(capabitites, self.showSkills, description)
+        return self.skillLink.getCapabilities(capabitites, self.showSkills, description)
 
     def checkActions(self, action: str) -> str:
         """
         Check if the given action is available in the self agent's skills.
         If the action is not found, it will return an error message.
         """
-        return self.skillsManager.checkActions(action)
+        return self.skillLink.checkActions(action)
 
     def getActions(self, action: str) -> list:
         """
         Get actions available for the self agent based on the given action string.
         If the action is not found, it will return an empty list.
         """
-        return self.skillsManager.getActions(action)
+        return self.skillLink.getActions(action)
 
     def executeAction(self, actions, action):
         """
@@ -187,7 +187,7 @@ class SkillGraph:
         If the action is not found, it will return an error message.
         You must do your own for loop to iterate through the actions.
         """
-        return self.skillsManager.executeAction(actions, action)
+        return self.skillLink.executeAction(actions, action)
 
     def executeActions(self, actions, action):
         """
@@ -196,7 +196,7 @@ class SkillGraph:
 
         The for loop is done for you to iterate through the actions.
         """
-        return self.skillsManager.executeActions(actions, action)
+        return self.skillLink.executeActions(actions, action)
 
     def skillInstructions(self):
         """
@@ -205,8 +205,8 @@ class SkillGraph:
         """
         # If you want to use the default skill instructions without examples, uncomment the next line
         # and comment the line below it.
-        #return self.skillsManager.skillInstructions(self.getAvaCapabilities())
-        return self.skillsManager.skillInstructions(self.getAgentCapabilities(), self.skillExamples())
+        #return self.skillLink.skillInstructions(self.getAvaCapabilities())
+        return self.skillLink.skillInstructions(self.getAgentCapabilities(), self.skillExamples())
 
     def skillExamples(self):
         """
@@ -233,7 +233,7 @@ class SkillGraph:
         If the tool is not found, it will return an error message.
         If the tool execution fails, it will retry based on the retry parameter.
         """
-        return self.skillsManager.executeTool(name, tools, args, threshold, retry)
+        return self.skillLink.executeTool(name, tools, args, threshold, retry)
 
     def getTools(self):
         """
@@ -243,13 +243,13 @@ class SkillGraph:
         tools = (
             self.agentTools
         )
-        return self.skillsManager.getTools(tools, self.showTools, self.schemaType)
+        return self.skillLink.getTools(tools, self.showTools, self.schemaType)
 
     def extractJson(self, text):
         """
         Extract the first JSON array or object from a string, even if wrapped in markdown or extra commentary.
         """
-        return self.skillsManager.extractJson(text)
+        return self.skillLink.extractJson(text)
 
     def getJsonSchema(self, func, schemaType):
         """
@@ -258,7 +258,7 @@ class SkillGraph:
         Compatible with the OpenAI API and similar services that use JSON schemas.
         Returns a dictionary representing the schema.
         """
-        return self.skillsManager.getJsonSchema(func, schemaType)
+        return self.skillLink.getJsonSchema(func, schemaType)
 
     def getTypedSchema(self, func):
         """
@@ -266,7 +266,7 @@ class SkillGraph:
         Compatible with the Google API.
         Returns a dictionary representing the schema.
         """
-        return self.skillsManager.getTypedSchema(func)
+        return self.skillLink.getTypedSchema(func)
 
 
     # ----- Can be used with both skills and tools -----
@@ -275,19 +275,19 @@ class SkillGraph:
         Check if any of the arguments is a list of dictionaries.
         This indicates structured input (multi-message format).
         """
-        return self.skillsManager.isStructured(*args)
+        return self.skillLink.isStructured(*args)
 
     def handleTypedFormat(self, role: str = "user", content: str = ""):
         """
         Format content for Google GenAI APIs.
         """
-        return self.skillsManager.handleTypedFormat(role, content)
+        return self.skillLink.handleTypedFormat(role, content)
 
     def handleJsonFormat(self, role: str = "user", content: str = ""):
         """
         Format content for OpenAI APIs and similar JSON-based APIs.
         """
-        return self.skillsManager.handleJsonFormat(role, content)
+        return self.skillLink.handleJsonFormat(role, content)
 
     def formatTypedExamples(self, items):
         """
@@ -298,7 +298,7 @@ class SkillGraph:
             - list of dicts: each dict converted to Content with role, dict as text
         Returns a flat list of Content objects.
         """
-        return self.skillsManager.formatTypedExamples(items)
+        return self.skillLink.formatTypedExamples(items)
 
     def formatJsonExamples(self, items):
         """
@@ -309,7 +309,7 @@ class SkillGraph:
             - list of dicts: each dict is added individually
         Returns a flat list of message dicts.
         """
-        return self.skillsManager.formatJsonExamples(items)
+        return self.skillLink.formatJsonExamples(items)
 
     def formatExamples(self, items, formatFunc):
         """
@@ -317,7 +317,7 @@ class SkillGraph:
         Accepts string, dict, list of any mix, any nested depth.
         Silently ignores None. Converts numbers and bools to strings.
         """
-        return self.skillsManager.formatExamples(items, formatFunc)
+        return self.skillLink.formatExamples(items, formatFunc)
 
     def handleTypedExamples(self, items):
         """
@@ -328,7 +328,7 @@ class SkillGraph:
             - list of dicts: each dict converted to Content with role, dict as text
         Returns a flat list of Content objects.
         """
-        return self.skillsManager.handleTypedExamples(items)
+        return self.skillLink.handleTypedExamples(items)
 
     def handleJsonExamples(self, items):
         """
@@ -339,7 +339,7 @@ class SkillGraph:
             - list of dicts: each dict is added individually
         Returns a flat list of message dicts.
         """
-        return self.skillsManager.handleJsonExamples(items)
+        return self.skillLink.handleJsonExamples(items)
 
     def handleExamples(self, items, formatFunc):
         """
@@ -347,13 +347,13 @@ class SkillGraph:
         Accepts string, dict, list of any mix, any nested depth.
         Silently ignores None. Converts numbers and bools to strings.
         """
-        return self.skillsManager.handleExamples(items, formatFunc)
+        return self.skillLink.handleExamples(items, formatFunc)
 
     def buildGoogleSafetySettings(self, harassment="BLOCK_NONE", hateSpeech="BLOCK_NONE", sexuallyExplicit="BLOCK_NONE", dangerousContent="BLOCK_NONE"):
         """
         Construct a list of Google GenAI SafetySetting objects.
         """
-        return self.skillsManager.buildGoogleSafetySettings(harassment, hateSpeech, sexuallyExplicit, dangerousContent)
+        return self.skillLink.buildGoogleSafetySettings(harassment, hateSpeech, sexuallyExplicit, dangerousContent)
 
 
     # ----- Loading Skills and Tools -----
@@ -366,7 +366,7 @@ class SkillGraph:
         """
         self.dynamicUserSkills = [] # If not using user setup, you can skip this.
         self.dynamicAgentSkills = []
-        self.skillsManager.loadComponents(
+        self.skillLink.loadComponents(
             paths=[
                 [self.getDir(self.baseSkillsDir, 'User', 'Created'), self.getDir(self.baseSkillsDir, 'User', 'Dynamic')], # If not using user setup, you can skip this.
                 [self.getDir(self.baseSkillsDir, 'Agent', 'Created'), self.getDir(self.baseSkillsDir, 'Agent', 'Dynamic')]
@@ -387,7 +387,7 @@ class SkillGraph:
         """
         self.staticUserSkills = [] # If not using user setup, you can skip this.
         self.staticAgentSkills = []
-        self.skillsManager.loadComponents(
+        self.skillLink.loadComponents(
             paths=[
                 [self.getDir(self.baseSkillsDir, 'User', 'Static')], # If not using user setup, you can skip this.
                 [self.getDir(self.baseSkillsDir, 'Agent', 'Static')]
@@ -408,7 +408,7 @@ class SkillGraph:
         """
         self.restrictedUserSkills = [] # If not using user setup, you can skip this.
         self.restrictedAgentSkills = []
-        self.skillsManager.loadComponents(
+        self.skillLink.loadComponents(
             paths=[
                 [self.getDir(self.baseSkillsDir, 'User', 'Restricted')], # If not using user setup, you can skip this.
                 [self.getDir(self.baseSkillsDir, 'Agent', 'Restricted')]
@@ -431,7 +431,7 @@ class SkillGraph:
         No advanced logic.
         """
         self.dynamicAgentSkills = []
-        self.skillsManager.loadComponents(
+        self.skillLink.loadComponents(
             paths=[[
                 self.getDir(self.baseSkillsDir, 'Agent', 'Created'), 
                 self.getDir(self.baseSkillsDir, 'Agent', 'Dynamic')]
@@ -441,21 +441,21 @@ class SkillGraph:
         )
 
         self.staticAgentSkills = []
-        self.skillsManager.loadComponents(
+        self.skillLink.loadComponents(
             paths=[[self.getDir(self.baseSkillsDir, 'Agent', 'Static')]],
             components=[self.staticAgentSkills],
             reloadable=[False]
         )
 
         self.restrictedAgentSkills = []
-        self.skillsManager.loadComponents(
+        self.skillLink.loadComponents(
             paths=[[self.getDir(self.baseSkillsDir, 'Agent', 'Restricted')]],
             components=[self.restrictedAgentSkills],
             reloadable=[False]
         )
 
         self.agentTools = []
-        self.skillsManager.loadComponents(
+        self.skillLink.loadComponents(
             paths=[[self.getDir(self.baseToolsDir, 'Tools')]],
             components=[self.agentTools],
             reloadable=[False]
@@ -491,7 +491,7 @@ class SkillGraph:
 
         for key, opts in COMPONENTS.items():
             setattr(self, opts['attr'], [])
-            self.skillsManager.loadComponents(
+            self.skillLink.loadComponents(
                 paths=[opts['paths']],
                 components=[getattr(self, opts['attr'])],
                 reloadable=[opts['reloadable']]

@@ -5,7 +5,7 @@ import os
 import threading
 import inspect
 
-from SkillsManager import SkillsManager
+from SkillLink import SkillLink
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +38,7 @@ class Apps:
         self.initialized = True
 
     def _initComponents(self):
-        self.skillsManager = SkillsManager()
+        self.skillLink = SkillLink()
         self.nameReplacements = NAME_REPLACEMENTS.copy()  # Copy to avoid modifying the original
         self.actionMap = {
             "open-app":  self._openApp,
@@ -53,7 +53,7 @@ class Apps:
 
     def appSkill(self, action: str, *args):
         """
-        We made it even easies to execute actions by using the SkillsManager to handle
+        We made it even easies to execute actions by using the SkillLink to handle
         the action execution. This way, we can easily add new actions without modifying
         the code here, just by adding them to the actionMap.
         """
@@ -67,9 +67,9 @@ class Apps:
         #     return actionKey(*args[:paramCount]) if paramCount > 0 else actionKey()
         # except Exception as e:
         #     logger.error(f"Error executing {self.__class__.__name__.lower()}Action '{action}':", exc_info=True)
-        self.skillsManager.argParser.printArgs(self, locals())
+        self.skillLink.argParser.printArgs(self, locals())
         name = inspect.currentframe().f_code.co_name
-        return self.skillsManager.executeSkill('system', name, self.actionMap, action, *args)
+        return self.skillLink.executeSkill('system', name, self.actionMap, action, *args)
 
     def _normalizeAppName(self, appName: str) -> str:
         app = appName.lower()

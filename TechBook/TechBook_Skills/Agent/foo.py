@@ -1,6 +1,6 @@
 
-##-------------------------- This is a quick example of how to use the SkillsManager to execute actions using dicts and lists --------------------------##
-# Please refer to get_weather.py for a more complete example of how to use the SkillsManager to execute actions using dicts and lists.
+##-------------------------- This is a quick example of how to use the SkillLink to execute actions using dicts and lists --------------------------##
+# Please refer to get_weather.py for a more complete example of how to use the SkillLink to execute actions using dicts and lists.
 
 import logging
 import subprocess
@@ -10,7 +10,7 @@ import inspect
 import requests
 import json
 
-from SkillsManager import SkillsManager
+from SkillLink import SkillLink
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +35,7 @@ class Dummy:
 
     def _initComponents(self):
         # self.argParser = ArgumentParser()
-        self.skillsManager = SkillsManager()
+        self.skillLink = SkillLink()
         self.listSig = {
         "_fooFunc": ["userId", "section"], # List of arguments for _fooFunc
         }
@@ -49,7 +49,7 @@ class Dummy:
 
     def fooBarSkill(self, action: str, *args):
         """
-        We made it even easies to execute actions by using the SkillsManager to handle
+        We made it even easies to execute actions by using the SkillLink to handle
         the action execution. This way, we can easily add new actions without modifying
         the code here, just by adding them to the actionMap.
         """
@@ -74,9 +74,9 @@ class Dummy:
         #     return actionKey(*args[:param_count])
         # except Exception as e:
         #     logger.error(f"Error executing {self.__class__.__name__.lower()}Action '{action}':", exc_info=True)
-        self.skillsManager.argParser.printArgs(self, locals())
+        self.skillLink.argParser.printArgs(self, locals())
         name = inspect.currentframe().f_code.co_name
-        return self.skillsManager.executeSkill('system', name, self.actionMap, action, *args)
+        return self.skillLink.executeSkill('system', name, self.actionMap, action, *args)
 
 
     def _fooFunc(self, infoList: list) -> str:

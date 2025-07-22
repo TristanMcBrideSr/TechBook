@@ -1,12 +1,12 @@
 import os
 import logging
 from dotenv import load_dotenv
-from SkillsManager import SkillsManager
+from SkillLink import SkillLink
 
 load_dotenv()
 logger = logging.getLogger(__name__)
 
-skillsmanager = SkillsManager()
+skillsmanager = SkillLink()
 fooPath   = skillsmanager.getDir('Skills', 'Foo')
 barPath   = skillsmanager.getDir('Skills', 'Bar')
 toolsPath = skillsmanager.getDir('Tools')

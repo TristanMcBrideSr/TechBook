@@ -3,7 +3,7 @@ import os
 import logging
 import threading
 from dotenv import load_dotenv
-from SkillsManager import SkillsManager
+from SkillLink import SkillLink
 
 # Load environment variables
 load_dotenv()
@@ -24,7 +24,7 @@ class ClassName: # This is a placeholder for the class name, replace with your a
     def __init__(self):
         if getattr(self, 'initialized', False):
             return
-        self.skillsmanager = SkillsManager()
+        self.skillsmanager = SkillLink()
         self.fooPath   = self.getDir('Skills', 'Foo')
         self.barPath   = self.getDir('Skills', 'Bar')
         self.toolsPath = self.getDir('Tools')

@@ -5,7 +5,7 @@ import logging
 import threading
 import inspect
 from SynMem_Examples.Example_1 import Memory
-from SkillsManager import ArgumentParser
+from SkillLink import ArgumentParser
 
 logger = logging.getLogger(__name__)
 

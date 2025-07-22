@@ -3,7 +3,7 @@ import logging
 import subprocess
 import os
 import inspect
-from SkillsManager import SkillsManager
+from SkillLink import SkillLink
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +35,7 @@ class AppManager:
         self.initialized = True
 
     def _initComponents(self):
-        self.skillsManager = SkillsManager()
+        self.skillLink = SkillLink()
         self.nameMap = APP_NAME_MAP.copy()
         self.actionMap = {
             "open": self._openApp,
@@ -50,7 +50,7 @@ class AppManager:
 
     def executeAction(self, ctx: str) -> str:
         """
-        We made it even easies to execute actions by using the SkillsManager to handle
+        We made it even easies to execute actions by using the SkillLink to handle
         the action execution. This way, we can easily add new actions without modifying
         the code here, just by adding them to the actionMap.
         """
@@ -65,9 +65,9 @@ class AppManager:
         # except Exception as e:
         #     logger.error(f"Error executing {self.__class__.__name__.lower()}Action '{ctx}':", exc_info=True)
         #     return f"Error: {e}"
-        self.skillsManager.argParser.printArgs(self, locals())
+        self.skillLink.argParser.printArgs(self, locals())
         name = inspect.currentframe().f_code.co_name
-        return self.skillsManager.executeSkill('user', name, self.actionMap, ctx)
+        return self.skillLink.executeSkill('user', name, self.actionMap, ctx)
 
     def _normalizeAppName(self, appName: str) -> str:
         app = appName.lower()
