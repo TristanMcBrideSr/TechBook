@@ -54,7 +54,7 @@ class AppManager:
         the action execution. This way, we can easily add new actions without modifying
         the code here, just by adding them to the actionMap.
         """
-        # self.argParser.printArgs(self, locals())
+        # self.skillLink.calledActions(self, locals())
         # try:
         #     ctxLower = ctx.lower()
         #     actionKey = next((key for key in self.actionMap if key in ctxLower), None)
@@ -73,7 +73,7 @@ class AppManager:
         app = appName.lower()
         return next((replacement for key, replacement in self.nameMap.items() if key in app), appName)
 
-    def _openApp(self, appName: str) -> str:
+    def _openApp(self, appName: str, *args) -> str: # FOR SAFETY REASONS ALWAYS ADD *args TO THE FUNCTION SIGNATURE EVEN IF NOT USED
         app = self._normalizeAppName(appName)
         try:
             os.startfile(app)
@@ -82,7 +82,7 @@ class AppManager:
             logger.error(f"Error opening {app}:", exc_info=True)
             return f"An error occurred while trying to open {app}: {e}"
 
-    def _closeApp(self, appName: str) -> str:
+    def _closeApp(self, appName: str, *args) -> str: # FOR SAFETY REASONS ALWAYS ADD *args TO THE FUNCTION SIGNATURE EVEN IF NOT USED
         app = self._normalizeAppName(appName)
         if not app.lower().endswith('.exe'):
             app += '.exe'

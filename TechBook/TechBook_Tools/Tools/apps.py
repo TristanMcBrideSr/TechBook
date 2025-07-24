@@ -58,6 +58,7 @@ class Apps:
         """
         Description: Open an application by its name, normalizing common names to their executable names.
         """
+        self.skillLink.calledActions(self, locals())
         app = self._normalizeAppName(appName)
         try:
             os.startfile(app)
@@ -70,6 +71,7 @@ class Apps:
         """
         Description: Close an application by its name, normalizing common names to their executable names.
         """
+        self.skillLink.calledActions(self, locals())
         app = self._normalizeAppName(appName)
         if not app.lower().endswith('.exe'):
             app += '.exe'

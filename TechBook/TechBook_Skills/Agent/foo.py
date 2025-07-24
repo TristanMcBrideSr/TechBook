@@ -53,7 +53,7 @@ class Dummy:
         the action execution. This way, we can easily add new actions without modifying
         the code here, just by adding them to the actionMap.
         """
-        # self.argParser.printArgs(self, locals())
+        # self.skillLink.calledActions(self, locals())
         # try:
         #     actionKey = self.actionMap.get(action.lower())
         #     if actionKey is None:

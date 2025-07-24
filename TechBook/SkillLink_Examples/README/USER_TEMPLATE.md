@@ -57,22 +57,26 @@ class DateTimeManager:
         }
 
     def executeAction(self, ctx: str):
-        self.argParser.printArgs(self, locals())
-        try:
-            action = ctx.lower()
-            actionKey = next((key for key in self.actionMap if key in action), None)
-            if not actionKey:
-                return None
-            args = action.replace(actionKey, "", 1).strip()
-            return self.actionMap[actionKey](args)
-        except Exception as e:
-            logger.error(f"Error executing {self.__class__.__name__.lower()}Action '{action}':", exc_info=True)
+        # self.skillLink.calledActions(self, locals())
+        # try:
+        #     ctxLower = ctx.lower()
+        #     actionKey = next((key for key in self.actionMap if key in ctxLower), None)
+        #     if not actionKey:
+        #         return None
+        #     args = ctxLower.replace(actionKey, "", 1).strip()
+        #     return self.actionMap[actionKey](args)
+        # except Exception as e:
+        #     logger.error(f"Error executing {self.__class__.__name__.lower()}Action '{ctx}':", exc_info=True)
+        #     return f"Error: {e}"
+        self.skillLink.calledActions(self, locals())
+        name = inspect.currentframe().f_code.co_name
+        return self.skillLink.executeSkill('user', name, self.actionMap, ctx)
 
-    def _getCurrentDate(self, *args) -> str:
+    def _getCurrentDate(self, *args) -> str: # FOR SAFETY REASONS ALWAYS ADD *args TO THE FUNCTION SIGNATURE EVEN IF NOT USED
         from datetime import datetime
         return datetime.now().strftime('%d-%B-%Y')
 
-    def _getCurrentTime(self, *args) -> str:
+    def _getCurrentTime(self, *args) -> str: # FOR SAFETY REASONS ALWAYS ADD *args TO THE FUNCTION SIGNATURE EVEN IF NOT USED
         from datetime import datetime
         return datetime.now().strftime('%H:%M')
 ```
@@ -85,10 +89,10 @@ class DateTimeManager:
 from datetime import datetime
 from SkillLink import SkillLink
 
-def _getCurrentDate(*args) -> str:
+def _getCurrentDate(*args) -> str: # FOR SAFETY REASONS ALWAYS ADD *args TO THE FUNCTION SIGNATURE EVEN IF NOT USED
     return datetime.now().strftime('%d-%B-%Y')
 
-def _getCurrentTime(*args) -> str:
+def _getCurrentTime(*args) -> str: # FOR SAFETY REASONS ALWAYS ADD *args TO THE FUNCTION SIGNATURE EVEN IF NOT USED
     return datetime.now().strftime('%H:%M')
 
 ACTION_MAP = {
@@ -99,16 +103,20 @@ ACTION_MAP = {
 skillLink = SkillLink()
 
 def executeAction(ctx: str):
-    argParser.printArgs("executeAction", locals())
-    try:
-        action = ctx.lower()
-        actionKey = next((key for key in ACTION_MAP if key in action), None)
-        if not actionKey:
-            return None
-        args = action.replace(actionKey, "", 1).strip()
-        return ACTION_MAP[actionKey](args)
-    except Exception as e:
-        return f"Error: {e}"
+    # self.skillLink.calledActions(self, locals())
+        # try:
+        #     ctxLower = ctx.lower()
+        #     actionKey = next((key for key in self.actionMap if key in ctxLower), None)
+        #     if not actionKey:
+        #         return None
+        #     args = ctxLower.replace(actionKey, "", 1).strip()
+        #     return self.actionMap[actionKey](args)
+        # except Exception as e:
+        #     logger.error(f"Error executing {self.__class__.__name__.lower()}Action '{ctx}':", exc_info=True)
+        #     return f"Error: {e}"
+    skillLink.calledActions(self, locals())
+    name = inspect.currentframe().f_code.co_name
+    return skillLink.executeSkill('user', name, self.actionMap, ctx)
 ```
 
 ---

@@ -44,7 +44,7 @@ class DTManager:
         the action execution. This way, we can easily add new actions without modifying
         the code here, just by adding them to the actionMap.
         """
-        # self.argParser.printArgs(self, locals())
+        # self.skillLink.calledActions(self, locals())
         # try:
         #     action = ctx.lower()
         #     actionKey = next((key for key in self.actionMap if key in action), None)
