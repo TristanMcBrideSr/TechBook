@@ -62,7 +62,7 @@ import threading
 import os
 import subprocess
 import logging
-from SkillLink import ArgumentParser
+from SkillLink import SkillLink
 
 logger = logging.getLogger(__name__)
 
@@ -93,7 +93,7 @@ class Apps:
         self.initialized = True
 
     def _initComponents(self):
-        self.argParser = ArgumentParser()
+        self.skillLink = SkillLink()
         self.nameReplacements = NAME_REPLACEMENTS.copy()
 
     def _metaData(self):
@@ -155,7 +155,7 @@ Private (underscore-prefixed) helpers are ignored.
 ```python
 import os
 import subprocess
-from SkillLink import ArgumentParser
+from SkillLink import SkillLink
 
 NAME_REPLACEMENTS = {
     "vs code":     "code",
@@ -166,7 +166,7 @@ NAME_REPLACEMENTS = {
     "explorer":    "iexplore",
 }
 
-argParser = ArgumentParser()
+skillLink = SkillLink()
 
 def openApp(appName: str) -> str:
     """

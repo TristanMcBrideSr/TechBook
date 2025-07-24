@@ -5,7 +5,7 @@ import os
 import threading
 import inspect
 
-from SkillLink import ArgumentParser
+from SkillLink import SkillLink
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +38,7 @@ class Apps:
         self.initialized = True
 
     def _initComponents(self):
-        self.argParser = ArgumentParser()
+        self.skillLink = SkillLink()
         self.nameReplacements = NAME_REPLACEMENTS.copy()  # Copy to avoid modifying the original
 
     def _metaData(self):

@@ -57,6 +57,7 @@ This framework enables you to write **skills**—modular logic units for controlli
 # **How To Create Skills**
 
 ## **1. Singleton Class With Action Map**
+Preferred way to create skills, as it allows for a clean structure and easy management of actions.
 
 If you put `_openApp` and `_closeApp` in `actionMap` / `action_map`, they are callable. If not, they aren’t.
 
@@ -69,12 +70,13 @@ It exposes only the dispatcher (like `appSkill`), but dynamically documents all 
 But you can also make a class with public methods, and they will be exposed as skills/actions (no action map required).
 
 ```python
-import threading
-import os
-import subprocess
 import logging
+import subprocess
+import os
+import threading
 import inspect
-from SkillLink import ArgumentParser
+
+from SkillLink import SkillLink
 
 logger = logging.getLogger(__name__)
 
@@ -87,6 +89,8 @@ NAME_REPLACEMENTS = {
     "explorer":    "iexplore",
 }
 
+
+## Singleton class for managing application actions
 class Apps:
     _instance = None
     _lock = threading.Lock()
@@ -105,23 +109,17 @@ class Apps:
         self.initialized = True
 
     def _initComponents(self):
-        self.argParser = ArgumentParser()
-        self.nameReplacements = NAME_REPLACEMENTS.copy()
+        self.skillLink        = SkillLink()
+        self.nameReplacements = NAME_REPLACEMENTS.copy()  # Copy to avoid modifying the original
         self.actionMap = {
             "open-app":  self._openApp,
             "close-app": self._closeApp
         }
 
     def appSkill(self, action: str, *args):
-        self.argParser.printArgs(self, locals())
-        try:
-            actionKey = self.actionMap.get(action.lower())
-            if actionKey is None:
-                return f"Invalid {self.__class__.__name__.lower()}Action provided: {action}"
-            paramCount = len(inspect.signature(actionKey).parameters)
-            return actionKey(*args[:paramCount]) if paramCount > 0 else actionKey()
-        except Exception as e:
-            logger.error(f"Error executing {self.__class__.__name__.lower()}Action '{action}':", exc_info=True)
+        self.skillLink.calledActions(self, locals())
+        name = inspect.currentframe().f_code.co_name
+        return self.skillLink.executeSkill('system', name, self.actionMap, action, *args)
 
     def _normalizeAppName(self, appName: str) -> str:
         app = appName.lower()
@@ -174,7 +172,7 @@ all valid **Actions** and argument info are read out of the `ACTION_MAP`.
 import os
 import subprocess
 import inspect
-from SkillLink import ArgumentParser
+from SkillLink import SkillLink
 
 NAME_REPLACEMENTS = {
     "vs code":     "code",
@@ -222,10 +220,10 @@ ACTION_MAP = {
     "close-app": _closeApp,
 }
 
-argParser = ArgumentParser()
+skillLink = SkillLink()
 
 def appSkill(action: str, *args):
-    argParser.printArgs("appSkill", locals())
+    skillLink.calledActions("appSkill", locals())
     action = action.lower()
     actionKey = ACTION_MAP.get(action)
     if not actionKey:
@@ -248,7 +246,7 @@ Private (underscore-prefixed) helpers are ignored.
 ```python
 import os
 import subprocess
-from SkillLink import ArgumentParser
+from SkillLink import SkillLink
 
 NAME_REPLACEMENTS = {
     "vs code":     "code",
@@ -259,10 +257,10 @@ NAME_REPLACEMENTS = {
     "explorer":    "iexplore",
 }
 
-argParser = ArgumentParser()
+skillLink = SkillLink()
 
 def openApp(appName: str) -> str:
-    argParser.printArgs("openApp", locals())
+    skillLink.calledActions("openApp", locals())
     for key, value in NAME_REPLACEMENTS.items():
         if key in appName.lower():
             appName = value
@@ -274,7 +272,7 @@ def openApp(appName: str) -> str:
         return f"An error occurred while trying to open {appName}: {e}"
 
 def closeApp(appName: str) -> str:
-    argParser.printArgs("closeApp", locals())
+    skillLink.calledActions("closeApp", locals())
     for key, value in NAME_REPLACEMENTS.items():
         if key in appName.lower():
             appName = value

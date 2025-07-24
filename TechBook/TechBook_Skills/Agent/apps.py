@@ -67,7 +67,7 @@ class Apps:
         #     return actionKey(*args[:paramCount]) if paramCount > 0 else actionKey()
         # except Exception as e:
         #     logger.error(f"Error executing {self.__class__.__name__.lower()}Action '{action}':", exc_info=True)
-        self.skillLink.argParser.printArgs(self, locals())
+        self.skillLink.calledActions(self, locals())
         name = inspect.currentframe().f_code.co_name
         return self.skillLink.executeSkill('system', name, self.actionMap, action, *args)
 

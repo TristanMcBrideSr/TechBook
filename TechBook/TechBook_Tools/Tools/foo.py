@@ -1,7 +1,7 @@
 
-from SkillLink import ArgumentParser
+from SkillLink import SkillLink
 
-argParser = ArgumentParser()
+skillLink = SkillLink()
 
 LIST_SIG = {
     "fooId": ["currentId", "newId", "section"]
@@ -15,7 +15,7 @@ def fooId(infoList: list):
     """
     Description: Update user ID in a specific section.
     """
-    argParser.printArgs(__name__, locals())
+    skillLink.calledActions('fooId', locals())
     currentId, newId, section = infoList
     return f"Got list with current userId={currentId}, with new userId={newId}, section={section}"
 
@@ -26,4 +26,5 @@ def fooId(infoList: list):
 #     currentId = infoDict.get("currentId")
 #     newId = infoDict.get("newId")
 #     section = infoDict.get("section")
+#     skillLink.calledActions('barId', locals())
 #     return f"Got list with current userId={currentId}, with new userId={newId}, section={section}"

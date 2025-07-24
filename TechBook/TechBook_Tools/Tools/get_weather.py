@@ -2,9 +2,9 @@
 import json
 import requests
 
-from SkillLink import ArgumentParser
+from SkillLink import SkillLink
 
-parser = ArgumentParser()
+skillLink = SkillLink()
 
 
 def get_weather(latitude: float, longitude: float) -> str:
@@ -12,7 +12,7 @@ def get_weather(latitude: float, longitude: float) -> str:
     Description: "Get current temperature for provided coordinates in celsius."
     Additional Information: "Provide the temperature in both Celsius and Fahrenheit."
     """
-    parser.printArgs(__name__, locals())
+    skillLink.calledActions('get_weather', locals())
     response = requests.get(
         f"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current_weather=true"
     )
@@ -30,7 +30,7 @@ def get_humidity(latitude: float, longitude: float) -> str:
     Description: "Get current relative humidity for provided coordinates."
     Additional Information: "Returns humidity as a percentage."
     """
-    parser.printArgs(__name__, locals())
+    skillLink.calledActions('get_humidity', locals())
     response = requests.get(
         f"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current_weather=true&hourly=relative_humidity_2m"
     )
@@ -48,7 +48,7 @@ def get_wind_speed(latitude: float, longitude: float) -> str:
     Description: "Get current wind speed for provided coordinates."
     Additional Information: "Provide the  wind speed in both meters per second (m/s) and miles per hour (mph)."
     """
-    parser.printArgs(__name__, locals())
+    skillLink.calledActions('get_wind_speed', locals())
     response = requests.get(
         f"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current_weather=true"
     )

@@ -1,8 +1,8 @@
 
 from datetime import datetime
-from SkillLink import ArgumentParser
+from SkillLink import SkillLink
 
-argParser = ArgumentParser()
+skillLink = SkillLink()
 
 def get_current_date():
     """
@@ -11,5 +11,5 @@ def get_current_date():
     """
     #print("Fetching the current date")
     
-    argParser.printArgs(__name__, locals())
+    skillLink.calledActions(__name__, locals())
     return datetime.now().strftime('%d-%B-%Y')

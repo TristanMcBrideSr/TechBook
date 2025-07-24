@@ -10,7 +10,8 @@ import logging
 from dotenv import load_dotenv
 from openai import OpenAI
 
-import TechBook_Utils.KnowledgeBase as KnowledgeBase # Reference to the KnowledgeBase module for setting up the KnowledgeBase
+from SyncLink import SyncLink
+from SynLrn import SynLrn
 
 # from QuantumSphere.EchoMatrix.EchoMatrix import EchoMatrix
 # from QuantumSphere.HoloMatrix.Evolution.Attributes.Attributes import Attributes
@@ -18,7 +19,6 @@ import TechBook_Utils.KnowledgeBase as KnowledgeBase # Reference to the Knowledg
 # from QuantumSphere.HoloMatrix.Evolution.Cognition.Memory.Components.Database.Database import Database
 # from QuantumSphere.HoloMatrix.Evolution.Cognition.NeuralLink.NeuralLink import NeuralLink
 
-from SynLrn import SynLrn
 
 load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -41,10 +41,22 @@ class Learning:
         # self.echoMatrix      = EchoMatrix()
         # self.getLearningLink = self.neuralLink.getLink("learningLink")
         # self.getLearningCore = self.neuralLink.getCore("learningCore")
+        self.syncLink    = SyncLink()
         self.attributes  = None  # Placeholder for Attributes instance
         self.learningDir = self.getDir("Learned")
+        # Example: Creating KnowledgeBase directory
+        self.knowledgeBaseDir = self.getDir("KnowledgeBase")  # Top-level
+        # Example: Creating nested KnowledgeBase directory
+        # self.knowledgeBaseDir = self.getDir("StartDir", "NextDir", "KnowledgeBase")  # Nested
+        self.dbName      = 'Learned.db'
         self.structured  = False
-        self.synLearn    = SynLrn(stages=Learning.STAGES, learningDir=self.learningDir, fallbacks=self.fallbacks, knowledgeBase=KnowledgeBase)
+        # This is for demonstration purposes, adjust as needed
+        self.syncLink      = SyncLink(githubRepo="TristanMcBrideSr/SkillForge", repoFolder="SkillForge/KnowledgeBase", syncDir=self.knowledgeBaseDir)
+        self.syncActivated = os.getenv("ACTIVATE_KNOWLEDGE_SYNC", "False")
+        if self.syncActivated:
+            self.syncLink.startSync(override=False)  # Download the latest KnowledgeBase the from SkillForge if True it will override the local KnowledgeBase directory file
+        import TechBook_Utils.KnowledgeBase as KnowledgeBase # Reference to the KnowledgeBase module for setting up the KnowledgeBase
+        self.synLearn = SynLrn(stages=Learning.STAGES, learningDir=self.learningDir, dbName=self.dbName, fallbacks=self.fallbacks, knowledgeBase=KnowledgeBase)
 
         self.viewDatabase()
 

@@ -34,7 +34,7 @@ class Dummy:
         self.initialized = True
 
     def _initComponents(self):
-        # self.argParser = ArgumentParser()
+        # self.skillLink = SkillLink()
         self.skillLink = SkillLink()
         self.listSig = {
         "_fooFunc": ["userId", "section"], # List of arguments for _fooFunc
@@ -74,7 +74,7 @@ class Dummy:
         #     return actionKey(*args[:param_count])
         # except Exception as e:
         #     logger.error(f"Error executing {self.__class__.__name__.lower()}Action '{action}':", exc_info=True)
-        self.skillLink.argParser.printArgs(self, locals())
+        self.skillLink.calledActions(self, locals())
         name = inspect.currentframe().f_code.co_name
         return self.skillLink.executeSkill('system', name, self.actionMap, action, *args)
 

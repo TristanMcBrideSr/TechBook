@@ -69,7 +69,7 @@ class Weather:
         }
 
     def weatherSkill(self, action: str, *args):
-        self.skillLink.argParser.printArgs(self, locals())
+        self.skillLink.calledActions(self, locals())
         name = inspect.currentframe().f_code.co_name
         return self.skillLink.executeSkill('system', name, self.actionMap, action, *args)
 
@@ -225,7 +225,7 @@ class Weather:
 #         }
 
 #     def weatherSkill(self, action: str, *args):
-#         self.skillLink.argParser.printArgs(self, locals())
+#         self.skillLink.calledActions(self, locals())
 #         name = inspect.currentframe().f_code.co_name
 #         return self.skillLink.executeSkill('system', name, self.actionMap, action, *args)
 
@@ -293,9 +293,9 @@ class Weather:
 # import json
 # import requests
 
-# from SkillLink import ArgumentParser
+# from SkillLink import SkillLink
 
-# argParser = ArgumentParser()
+# skillLink = SkillLink()
 
 
 # def get_weather(latitude: float, longitude: float) -> str:
@@ -303,7 +303,7 @@ class Weather:
 #     Description: "Get current temperature for provided coordinates in celsius."
 #     Additional Information: "Provide the temperature in both Celsius and Fahrenheit."
 #     """
-#     argParser.printArgs(__name__, locals())
+#     skillLink.calledActions(__name__, locals())
 #     response = requests.get(
 #         f"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current_weather=true"
 #     )
@@ -322,7 +322,7 @@ class Weather:
 #     Description: "Get current relative humidity for provided coordinates."
 #     Additional Information: "Returns humidity as a percentage."
 #     """
-#     argParser.printArgs(__name__, locals())
+#     skillLink.calledActions(__name__, locals())
 #     response = requests.get(
 #         f"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current_weather=true&hourly=relative_humidity_2m"
 #     )
@@ -340,7 +340,7 @@ class Weather:
 #     Description: "Get current wind speed for provided coordinates."
 #     Additional Information: "Returns wind speed in meters per second (m/s)."
 #     """
-#     argParser.printArgs(__name__, locals())
+#     skillLink.calledActions(__name__, locals())
 #     response = requests.get(
 #         f"https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&current_weather=true"
 #     )

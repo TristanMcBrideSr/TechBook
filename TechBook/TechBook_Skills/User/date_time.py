@@ -55,7 +55,7 @@ class DTManager:
         # except Exception as e:
         #     logger.error(f"Error executing {self.__class__.__name__.lower()}Action '{ctx}':", exc_info=True)
         #     return f"Error: {e}"
-        self.skillLink.argParser.printArgs(self, locals())
+        self.skillLink.calledActions(self, locals())
         name = inspect.currentframe().f_code.co_name
         return self.skillLink.executeSkill('user', name, self.actionMap, ctx)
 

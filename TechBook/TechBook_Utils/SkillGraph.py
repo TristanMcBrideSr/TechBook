@@ -5,7 +5,7 @@ import threading
 import logging
 from dotenv import load_dotenv
 
-from SkillLink import SkillLink # Pip install SkillLink using `pip install SkillLink`
+from SkillLink import SkillLink, SyncLink # Pip install SkillLink using `pip install SkillLink`
 
 load_dotenv()
 
@@ -37,12 +37,17 @@ class SkillGraph:
     def _initComponents(self):
         self.skillLink     = SkillLink() # Can pass in autoReload=True and cycleInterval=60 to automatically reload skills when they change.
         # Set your base directories. Is equivalent to r"C:\path\to\TechBook_Skills" on Windows or "/path/to/TechBook_Skills" on Linux/Mac.
+        self.syncLink      = SyncLink(githubRepo="TristanMcBrideSr/SkillForge", repoFolder="SkillForge/Forge", syncDir=self.db.forgedSkillsDir)
         self.baseSkillsDir = self.getDir('TechBook_Skills')
         self.baseToolsDir  = self.getDir('TechBook_Tools')
         self.showSkills    = os.getenv('SHOW_SKILLS', 'False') == 'True'
         self.showTools     = os.getenv('SHOW_TOOLS', 'False') == 'True'
         self.schemaType    = os.getenv('SCHEMA_TYPE', 'chat_completions').lower()  # Default to 'chat_completions' if not set
         self.showMetaData  = os.getenv('SHOW_METADATA', 'False') == 'True'
+        self.syncActivated = os.getenv("ACTIVATE_SKILL_SYNC", "False")
+        if self.syncActivated:
+            # self.skillList=["research"] # List the skills you want to sync from SkillForge
+            self.syncLink.startSync() #(syncList=self.skillList, override=False)  # Download the latest skills from SkillForge changing the override parameter to True will overwrite existing skills
         self.skillComponents()
         self.toolComponents()
         self.showSkillsAndTools()  # Load skills and tools at startup if configured to do so.

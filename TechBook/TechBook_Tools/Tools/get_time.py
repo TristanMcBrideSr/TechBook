@@ -1,13 +1,13 @@
 
 from datetime import datetime
-from SkillLink import ArgumentParser
+from SkillLink import SkillLink
 
-parser = ArgumentParser()
+skillLink = SkillLink()
 
 def get_current_time():
     """
     Description: "Get the current time in HH:MM format."
     Additional Information: "This function returns the current time formatted as hour:minute."
     """
-    parser.printArgs(__name__, locals())
+    skillLink.calledActions('get_current_time', locals())
     return datetime.now().strftime('%H:%M')

@@ -5,7 +5,7 @@ import logging
 import threading
 import inspect
 from SynMem_Examples.Example_1 import Memory
-from SkillLink import ArgumentParser
+from SkillLink import SkillLink
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +28,7 @@ class MemoryManager:
         self.initialized = True
 
     def _initComponents(self):
-        self.argParser  = ArgumentParser()
+        self.argParser  = SkillLink()
         self.memory = Memory()
         self.actionMap = {
             **self.memory.actionMap, # by doing this, we can call the actionMap from within the Memory's actionMap,
