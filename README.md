@@ -41,10 +41,6 @@ If you like any of our projects, consider supporting it by starring the reposito
 
 ---
 
-## Acknowledgements
-
-Project by:
+## Authors
 - Tristan McBride Sr.
 - Sybil
-
-
