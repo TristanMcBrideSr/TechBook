@@ -70,17 +70,6 @@ class SkillGraph:
     def getDir(self, *paths):
         return self.skillLink.getDir(*paths)
 
-    # No longer needed as auto reload is set in skillComponents method.
-    # def setAutoReload(self, autoReload: bool = True, cycleInterval: int = 60) -> None:
-    #     """
-    #     Set whether to automatically reload skills when they change.
-    #     This is useful for development and testing purposes.
-    #     By default SkillLink auto reload is set to False with a cycle interval of 60 seconds you can change this 
-    #     by passing autoReload=True to enable or a different cycleInterval in seconds.
-    #     Only necessary when letting the agent create new skills or when you want to refresh the skills during runtime.
-    #     """
-    #     self.skillLink.setAutoReload(autoReload, cycleInterval)
-
     # If you rather not separate the skills into dynamic, static and restricted components, you can skip the following methods and make 
     # it simpler by using just using 1 method to load all skills.
     # See below for different options for loading skills and tools.
