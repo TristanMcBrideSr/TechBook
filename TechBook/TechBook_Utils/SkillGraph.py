@@ -70,15 +70,16 @@ class SkillGraph:
     def getDir(self, *paths):
         return self.skillLink.getDir(*paths)
 
-    def setAutoReload(self, autoReload: bool = True, cycleInterval: int = 60) -> None:
-        """
-        Set whether to automatically reload skills when they change.
-        This is useful for development and testing purposes.
-        By default SkillLink auto reload is set to False with a cycle interval of 60 seconds you can change this 
-        by passing autoReload=True to enable or a different cycleInterval in seconds.
-        Only necessary when letting the agent create new skills or when you want to refresh the skills during runtime.
-        """
-        self.skillLink.setAutoReload(autoReload, cycleInterval)
+    # No longer needed as auto reload is set in skillComponents method.
+    # def setAutoReload(self, autoReload: bool = True, cycleInterval: int = 60) -> None:
+    #     """
+    #     Set whether to automatically reload skills when they change.
+    #     This is useful for development and testing purposes.
+    #     By default SkillLink auto reload is set to False with a cycle interval of 60 seconds you can change this 
+    #     by passing autoReload=True to enable or a different cycleInterval in seconds.
+    #     Only necessary when letting the agent create new skills or when you want to refresh the skills during runtime.
+    #     """
+    #     self.skillLink.setAutoReload(autoReload, cycleInterval)
 
     # If you rather not separate the skills into dynamic, static and restricted components, you can skip the following methods and make 
     # it simpler by using just using 1 method to load all skills.
@@ -101,8 +102,9 @@ class SkillGraph:
             ],
             reloadable=[
                 False, # If not using user setup, you can skip this.
-                False # This is for dynamic skills, so set to True if you want to reload them.
-            ]
+                False # This is for dynamic skills, so set to True if you want to reload them this will also set autoReload to True with a cycleInterval of 60 seconds.
+            ],
+            #cycleInterval=60 # Optional, set the cycle interval in seconds for auto reloading skills (default is 60 seconds).
         )
 
     def toolComponents(self):
